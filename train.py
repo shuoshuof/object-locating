@@ -7,28 +7,6 @@ from training.loss_function import SSD_loss
 from training.metrics import Recall
 import time
 from nets.mini_ssd import mini_ssd
-# def mini_ssd(input_shape=(96,128,3),alpha=1.0):
-#
-#     inputs = keras.layers.Input(shape=input_shape)
-#     rescale_layer = keras.layers.Rescaling(scale=1. / 127.5, offset=-1)
-#
-#     x = rescale_layer(inputs)
-#     x = mobilenetv2_backbone(x,alpha=alpha)
-#
-#     #对坐标偏移预测
-#     pos_offest = keras.layers.Conv2D(2,kernel_size=(3,3), padding='same')(x)#(3,4,96)->(3,4,2)
-#     pos_offest = keras.layers.Flatten()(pos_offest)#(24)
-#
-#
-#     #判断是否有目标板
-#     target_conf = keras.layers.Conv2D(1,kernel_size=(3,3),padding='same')(x)#(3,4,96)->(3,4,1)
-#     target_conf = keras.layers.Flatten()(target_conf)#(12)
-#     target_conf = tf.keras.activations.sigmoid(target_conf)
-#
-#     outputs = keras.layers.Concatenate()([pos_offest,target_conf])#(36)
-#
-#     model = keras.Model(inputs,outputs)
-#     return model
 
 if __name__=='__main__':
     batch_size =512

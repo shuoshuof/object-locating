@@ -2,7 +2,7 @@ from Mydataloader import RandomTarget_dataset
 import numpy as np
 import cv2
 import os
-from utils.util import *
+from util import *
 def create_data(root,create_num,img_num,overwrite):
     batch_size = 1
     if overwrite:

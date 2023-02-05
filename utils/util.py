@@ -49,7 +49,7 @@ def decode(label,box_r = 32):
 #判断生成的坐标是否太靠近
 def judge_point(img_pos,x,y,d):
     for point in img_pos:
-        x1,y1 =point
+        x1,y1,_ =point
         if abs(x1-x)<=d and abs(y1-y)<=d:
 
             return False
