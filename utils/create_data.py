@@ -3,6 +3,7 @@ import numpy as np
 import cv2
 import os
 from util import *
+from target_utils import *
 def create_data(root,create_num,img_num,overwrite):
     batch_size = 1
     if overwrite:
@@ -22,20 +23,6 @@ def create_data(root,create_num,img_num,overwrite):
         for (img, label) in dataset:
             img1 = np.array(img[0], dtype=np.uint8)
             labels.append(label[0])
-
-            # for i in range(3):
-            #     for j in range(4):
-            #         y, x = 32 * i, 32 * j
-            #         img1 = cv2.rectangle(img1, (x, y), (x + 32, y + 32), color=(0, 0, 255))
-            # img_pos = decode(label[0])
-            # print(label[0])
-            # print(img_pos)
-            # for point in img_pos:
-            #     x, y = point
-            #     cv2.circle(img1, (int(x), int(y)), radius=2, color=(0, 255, 0))
-            # plt.figure()
-            # plt.imshow(img1)
-            # plt.show()
 
             """
             opencv 为bgr要转rgb
@@ -57,12 +44,24 @@ def check(root):
     assert t==len(labels)
     return t,labels
 
+#旧版编码转新版编码
+def labels_transformation(label_path):
+    labels =np.load(label_path)
+    new_labels = []
+    encoder = target_encoder()
+    for label in labels:
+        coords = decode(label)
+        size = np.zeros((coords.shape[0],1))
+        coords = np.concatenate((coords,size),axis=1)
+        new_label = encoder.encode(coords)
+        new_labels.append(new_label)
+        # print(new_label)
+    np.save(label_path, new_labels)
 if __name__ == '__main__':
 
-    t= 1
     train_num=100000
     valid_num=1000
-    test_num=10
+    test_num=30
     labels =[]
     train_root = '../dataset/train'
     valid_root = '../dataset/valid'
@@ -72,4 +71,4 @@ if __name__ == '__main__':
     # create_data(root=train_root, create_num=train_num, img_num=img_num, overwrite=overwrite)
     # create_data(root=valid_root,create_num=valid_num,img_num=img_num,overwrite=overwrite)
     create_data(root=test_root,create_num=test_num,img_num=img_num,overwrite=overwrite)
-
+    # labels_transformation('../dataset/train/labels.npy')

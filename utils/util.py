@@ -21,11 +21,12 @@ def get_mask(img):
     _,mask = cv2.threshold(img_mask,50,255,cv2.THRESH_BINARY_INV)
     mask = cv2.resize(mask,(w,r))
     return mask
+
 def encode(img_center_points,box_r = 32):
     label = np.zeros(36,dtype=np.float32) # 0:24 为目标中心相对格子中心x,y坐标偏移量， 24:为12个格子内是否有目标
 
     for point in img_center_points:
-        x, y = point
+        x, y,_ = point
         box_idex = x // box_r + 4 * (y // box_r)
         x_offset, y_offset = x % box_r - box_r / 2, y % box_r - box_r / 2#相对格子中心
         # x_offset, y_offset = x % box_r, y % box_r  # 相对格子左上角
@@ -57,6 +58,27 @@ def judge_point(img_pos,x,y,d):
 def remove_frame(img):
     img = img[40:376,40:376,:]
     return img
+def result_show(img,label,decoder,model=None):
+    if model is not None:
+        pred = model.predict(np.expand_dims(img,axis=0))
+        pred_pos = decoder.decode(pred[0])
+        img = cv2.resize(img,(128,96))
+        for point in pred_pos:
+            x, y = point
+            cv2.circle(img, (int(x), int(y)), radius=1, color=(255, 0, 0))
+    for i in range(3):
+        for j in range(4):
+            y, x = 32 * i, 32 * j
+            img = cv2.rectangle(img, (x, y), (x + 32, y + 32), color=(0, 0, 255))
+    img_pos = decoder.decode(label)
+    for point in img_pos:
+        x, y = point
+        cv2.circle(img, (int(x), int(y)), radius=2, color=(0, 255, 0))
+
+    plt.figure()
+    plt.imshow(img)
+    plt.show()
+
 if __name__=="__main__":
     # bg_img_path = r'C:\Users\du\Desktop\17_ai\make_dataset\blue_background\00000.jpg'
     # path = r'C:\Users\du\Desktop\17_ai\make_dataset\dataset_3_5\animals\cat\cat10.jpg'

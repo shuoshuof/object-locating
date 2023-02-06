@@ -4,11 +4,11 @@ import random
 from PIL import Image
 import cv2
 import numpy as np
-from util import *
+from utils.util import *
 import math
 import matplotlib.pyplot as plt
 import os
-from target_utils import target_encoder
+from utils.target_utils import target_encoder,target_decoder
 #解决中文路径
 def cv_imread(file_path):
     cv_img = cv2.imdecode(np.fromfile(file_path, dtype=np.uint8), cv2.IMREAD_COLOR)
@@ -99,41 +99,19 @@ class RandomTarget_dataset(tf.keras.utils.Sequence):
             target_centers.append([x, y,size])
         # 创建一张黑色画布,尺寸要比目标尺寸大，最后截取中间部分，这样可以包含边界不完整情况
 
-
-        # for point in target_centers:
-        #     size = random.randint(self.img_size[0],self.img_size[1])//2*2+1
-        #     img_rotate = random_rotate(img)
-        #     img_rotate = cv2.resize(img_rotate, (size, size))
-        #     x,y = point
-        #     _x = x+self.box_r//2-(size-1)//2
-        #     x_ = x+self.box_r//2+(size-1)//2+1
-        #     _y = y+self.box_r//2-(size-1)//2
-        #     y_ = y+self.box_r//2+(size-1)//2+1
-        #     img0[_y:y_,_x:x_,:] = img_rotate[:, :, :]
         img0 =  img0[self.box_r//2:self.box_r//2+self.bg_r,self.box_r//2:self.box_r//2+self.bg_w]
 
         mask = get_mask(img0)
         bg_img = cv2.bitwise_and(bg_img, bg_img, mask=mask)
         img1 = cv2.add(bg_img, img0)
-        # label = self.encode(target_centers,self.box_r)
-        label = self.encoder.encode(target_centers)
+        label = encode(target_centers,self.box_r)
+        # label = self.encoder.encode(target_centers)
         """
         opencv 为bgr要转rgb
         """
         img1 = img1[:,:,::-1]
         return np.array(img1,dtype=np.float32),np.array(label,dtype=np.float32)
-    # def encode(self,target_centers,box_r):
-    #     label = np.zeros(36, dtype=np.float32)  # 0:24 为目标中心相对格子中心x,y坐标偏移量， 24:为12个格子内是否有目标
-    #
-    #     for point in target_centers:
-    #         x, y,_ = point
-    #         box_idex = x // box_r + 4 * (y // box_r)
-    #         x_offset, y_offset = x % box_r - box_r / 2, y % box_r - box_r / 2#相对格子中心
-    #         # x_offset, y_offset = x % box_r, y % box_r #相对格子左上角
-    #         x_offset, y_offset = x_offset / box_r, y_offset / box_r  # 归一化
-    #         label[2 * box_idex], label[2 * box_idex + 1] = x_offset, y_offset
-    #         label[24 + box_idex] = 1
-    #     return label
+
     def on_epoch_end(self):
         random.shuffle(self.paths)
     def __len__(self):
@@ -180,31 +158,19 @@ class Fast_dataset(tf.keras.utils.Sequence):
 if __name__=='__main__':
     batch_size =1
     img_num=3
-    dataset = RandomTarget_dataset(root = r'C:\Project\python\dataset\加框后的JPEG图',
-                          batch_size=batch_size,bg_r=96,bg_w=128,
-                          bg_root=r'C:\Project\python\dataset\background',
-                          img_num=img_num,
-                          Chinese_path=True)
-    # dataset = Fast_dataset(
-    #     imgs_path='../dataset/valid/images',
-    #     labels_path='../dataset/valid/labels.npy',
-    #     batch_size=batch_size
-    # )
-    print(dataset[0][0])
+    # dataset = RandomTarget_dataset(root = r'C:\Project\python\dataset\加框后的JPEG图',
+    #                       batch_size=batch_size,bg_r=96,bg_w=128,
+    #                       bg_root=r'C:\Project\python\dataset\background',
+    #                       img_num=img_num,
+    #                       Chinese_path=True)
+    dataset = Fast_dataset(
+        imgs_path='../dataset/train/images',
+        labels_path='../dataset/train/labels.npy',
+        batch_size=batch_size
+    )
+
+
     for (img,label) in dataset:
         print(img.shape)
         img1 = np.array(img[0],dtype=np.uint8)
-        #绘制网格
-        for i in range(3):
-            for j in range(4):
-                y, x = 32 * i, 32 * j
-                img1 = cv2.rectangle(img1, (x, y), (x + 32, y + 32), color=(0, 0, 255))
-        img_pos=decode(label[0])
-        print(label[0])
-        print(img_pos)
-        for point in img_pos:
-            x, y = point
-            cv2.circle(img1, (int(x), int(y)), radius=2, color=(0, 255, 0))
-        plt.figure()
-        plt.imshow(img1)
-        plt.show()
+        result_show(img1,label[0],target_decoder())
