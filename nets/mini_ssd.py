@@ -1,6 +1,6 @@
 import tensorflow as tf
 from tensorflow import keras
-from nets.backbone import mobilenetv2_backbone
+from nets.backbone import mobilenet_backbone
 
 '''
 art QQVGA为160x120，考虑96x128输入
@@ -13,30 +13,74 @@ art QQVGA为160x120，考虑96x128输入
     w/4=2^m
 '''
 
-def mini_ssd(input_shape=(96,128,3),alpha=1.0):
+# def mini_ssd(input_shape=(96,128,3),alpha=1.0):
+#
+#     inputs = keras.layers.Input(shape=input_shape)
+#     rescale_layer = keras.layers.Rescaling(scale=1. / 127.5, offset=-1)
+#
+#     x = rescale_layer(inputs)
+#     x = mobilenetv2_backbone(x,alpha=alpha)
+#
+#     #对坐标偏移预测
+#     pos_offest = keras.layers.Conv2D(2,kernel_size=(3,3), padding='same')(x)#(3,4,96)->(3,4,2)
+#     pos_offest = keras.layers.Flatten()(pos_offest)#(24)
+#
+#
+#     #判断是否有目标板
+#     target_conf = keras.layers.Conv2D(1,kernel_size=(3,3),padding='same')(x)#(3,4,96)->(3,4,1)
+#     target_conf = keras.layers.Flatten()(target_conf)#(12)
+#     target_conf = tf.keras.activations.sigmoid(target_conf)
+#
+#     outputs = keras.layers.Concatenate()([pos_offest,target_conf])#(36)
+#
+#     model = keras.Model(inputs,outputs)
+#     return model
 
-    inputs = keras.layers.Input(shape=input_shape)
-    rescale_layer = keras.layers.Rescaling(scale=1. / 127.5, offset=-1)
+class ShuoShuoNet():
+    def __init__(self,
+                 input_shape: tuple = (96, 128, 3),
+                 alpha=0.35,
+                 FeatureMap_shape: tuple = (3, 4),
+                 backbone=None,
+                 ):
 
-    x = rescale_layer(inputs)
-    x = mobilenetv2_backbone(x,alpha=alpha)
+        self.Input_shape = input_shape
 
-    #对坐标偏移预测
-    pos_offest = keras.layers.Conv2D(2,kernel_size=(3,3), padding='same')(x)#(3,4,96)->(3,4,2)
-    pos_offest = keras.layers.Flatten()(pos_offest)#(24)
+        self.Input_layer = keras.layers.Input(shape=self.Input_shape)
+        self.rescale_layer = keras.layers.Rescaling(scale=1. / 127.5, offset=-1)
+
+        self.backbone = mobilenet_backbone(
+            input_shape = self.Input_shape,
+            alpha = alpha,
+            FeatureMap_shape = FeatureMap_shape,
+        )  if backbone is None else backbone
 
 
-    #判断是否有目标板
-    target_conf = keras.layers.Conv2D(1,kernel_size=(3,3),padding='same')(x)#(3,4,96)->(3,4,1)
-    target_conf = keras.layers.Flatten()(target_conf)#(12)
-    target_conf = tf.keras.activations.sigmoid(target_conf)
+        self.coord_offset =  keras.layers.Conv2D(2,kernel_size=(3,3), padding='same')
+        self.offset_flatten = keras.layers.Flatten()
 
-    outputs = keras.layers.Concatenate()([pos_offest,target_conf])#(36)
+        self.target_conf = keras.layers.Conv2D(1,kernel_size=(3,3),padding='same')
+        self.conf_flatten = keras.layers.Flatten()
+        self.conf_activations = tf.keras.activations.sigmoid
+    def model(self):
+        inputs = self.Input_layer
+        x=  self.rescale_layer(inputs)
 
-    model = keras.Model(inputs,outputs)
-    return model
+        x = self.backbone(x)
 
+        #回归头
+        coord_outputs = self.coord_offset(x)
+        coord_outputs = self.offset_flatten(coord_outputs)
+
+        #分类头
+        conf_outputs = self.target_conf(x)
+        conf_outputs = self.conf_flatten(conf_outputs)
+        conf_outputs = self.conf_activations(conf_outputs)
+
+        outputs = keras.layers.Concatenate()([coord_outputs,conf_outputs])
+        model = keras.Model(inputs, outputs)
+        return model
 if __name__=='__main__':
-    model = mini_ssd()
+    model  = ShuoShuoNet().model()
+
     model.summary()
-    model.save("./mini_ssd.h5")

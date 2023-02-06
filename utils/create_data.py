@@ -6,6 +6,8 @@ from util import *
 from target_utils import *
 def create_data(root,create_num,img_num,overwrite):
     batch_size = 1
+    if os.path.exists(f'{root}/images') is not True:
+        os.makedirs(f'{root}/images')
     if overwrite:
         t=0
         labels=[]

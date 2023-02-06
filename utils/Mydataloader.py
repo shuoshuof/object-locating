@@ -9,6 +9,7 @@ import math
 import matplotlib.pyplot as plt
 import os
 from utils.target_utils import target_encoder,target_decoder
+
 #解决中文路径
 def cv_imread(file_path):
     cv_img = cv2.imdecode(np.fromfile(file_path, dtype=np.uint8), cv2.IMREAD_COLOR)
@@ -97,15 +98,15 @@ class RandomTarget_dataset(tf.keras.utils.Sequence):
             y_ = y+self.box_r//2+(size-1)//2+1
             img0[_y:y_,_x:x_,:] = img_rotate[:, :, :]
             target_centers.append([x, y,size])
-        # 创建一张黑色画布,尺寸要比目标尺寸大，最后截取中间部分，这样可以包含边界不完整情况
 
+        # 创建一张黑色画布,尺寸要比目标尺寸大，最后截取中间部分，这样可以包含边界不完整情况
         img0 =  img0[self.box_r//2:self.box_r//2+self.bg_r,self.box_r//2:self.box_r//2+self.bg_w]
 
         mask = get_mask(img0)
         bg_img = cv2.bitwise_and(bg_img, bg_img, mask=mask)
         img1 = cv2.add(bg_img, img0)
-        label = encode(target_centers,self.box_r)
-        # label = self.encoder.encode(target_centers)
+        # label = encode(target_centers,self.box_r)
+        label = self.encoder.encode(target_centers)
         """
         opencv 为bgr要转rgb
         """
