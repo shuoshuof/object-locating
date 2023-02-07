@@ -6,7 +6,7 @@ from training.callbacks import *
 from training.loss_function import SSD_loss
 from training.metrics import Recall
 import time
-from nets.mini_ssd import ShuoShuoNet
+from nets.ObjectLocatingModel import ShuoShuoNet
 
 if __name__=='__main__':
     batch_size =512
