@@ -110,7 +110,7 @@ class target_decoder(object):
                  FeatureMap_shape: tuple = (3, 4),
                  box_size=40,
                  pred_size=False,
-                 match_threshold=8):
+                 match_threshold=10):
         self.input_size = input_size
         self.FeatureMap_shape = FeatureMap_shape
         assert self.input_size[0]/self.FeatureMap_shape[0] == self.input_size[1]/self.FeatureMap_shape[1]

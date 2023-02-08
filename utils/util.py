@@ -66,6 +66,7 @@ def result_show(img,label,decoder,model=None):
         for point in pred_pos:
             x, y = point
             cv2.circle(img, (int(x), int(y)), radius=1, color=(255, 0, 0))
+            cv2.rectangle(img, (int(x)-14, int(y)-14), (int(x)+14, int(y)+14),color=(255, 0, 0))
     for i in range(3):
         for j in range(4):
             y, x = 32 * i, 32 * j

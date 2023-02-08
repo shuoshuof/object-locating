@@ -12,30 +12,14 @@ import json
 import time
 import os
 from utils.target_utils import *
-# font = {'family': 'SimHei', "size": 24}
-# matplotlib.rc('font', **font)
-# input_size =128
-# def get_confusion_matrix(label,y_pred,cls):
-#     Confusion_Matrix = confusion_matrix(label, y_pred)
-#     cls_sum = Confusion_Matrix.sum(axis=0)
-#     Confusion_Matrix = Confusion_Matrix/cls_sum#归一化
-#     print(np.around(Confusion_Matrix,3))
-#     Confusion_Matrix=Confusion_Matrix*255
-#     plt.matshow(Confusion_Matrix, cmap=plt.cm.Greens)
-#     plt.xlabel('predict')
-#     plt.ylabel('true')
-#     xlocations = np.array(range(len(cls)))
-#     print(cls)
-#     print(xlocations)
-#     plt.xticks(xlocations, cls, rotation=0)
-#     plt.yticks(xlocations, cls)
-#     plt.show()
+
 def result_show(img,label,decoder,pred):
     pred_pos = decoder.decode(pred)
     img = cv2.resize(img,(128,96))
     for point in pred_pos:
         x, y = point
-        cv2.circle(img, (int(x), int(y)), radius=1, color=(255, 0, 0))
+        cv2.circle(img, (int(x), int(y)), radius=2, color=(255, 0, 0))
+        cv2.rectangle(img, (int(x) - 14, int(y) - 14), (int(x) + 14, int(y) + 14), color=(255, 0, 0))
     for i in range(3):
         for j in range(4):
             y, x = 32 * i, 32 * j
@@ -77,9 +61,7 @@ def tflite_pre(modelpath,dataset_root,batch_size=1,input_size:tuple = (96,128)):
         img1 = cv2.resize(img1,(128,96))
         result_show(img1,label[0],target_decoder(),pred=output[0])
 
-    # get_confusion_matrix(labels,predictions,valid_dataset.class_indices)
-    # return acc/sum
-def convert_to_tf_lite(model_path,valid_input_size:tuple,valid_path=None):
+def convert_to_tf_lite(model_path,valid_input_size:tuple):
     model = load_model(model_path,compile=False)
 
     converter = tf.lite.TFLiteConverter.from_keras_model(model)
@@ -96,13 +78,7 @@ def convert_to_tf_lite(model_path,valid_input_size:tuple,valid_path=None):
 
     with open(save_path, 'wb') as f:
         f.write(tflite_model)
-    # if valid_path!=None:
-    #     tflite_pre(modelpath=save_path,
-    #                  dataset_root=valid_path,
-    #                  input_size=valid_input_size)
-    #     remark = {'model_path':model_path,'input_size':valid_input_size,'valid_path':valid_path,'acc':acc}
-    #     with open(save_root+"/remark.json",'w',encoding='utf-8') as f:
-    #         json.dump(remark,f)
+
 input_size = (48,64)
 # convert_to_tf_lite(model_path='models_save/2023_02_07_00_34_58/model_70_0.0246.h5',
 #                    valid_input_size=input_size,

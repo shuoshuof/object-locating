@@ -36,7 +36,7 @@ art QQVGA为160x120，考虑96x128输入
 #     model = keras.Model(inputs,outputs)
 #     return model
 
-class ShuoShuoNet():
+class ShuoShuoNet:
     def __init__(self,
                  input_shape: tuple = (96, 128, 3),
                  alpha=0.35,

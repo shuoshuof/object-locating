@@ -1,9 +1,9 @@
-from Mydataloader import RandomTarget_dataset
+from utils.Mydataloader import RandomTarget_dataset
 import numpy as np
 import cv2
 import os
-from util import *
-from target_utils import *
+from utils.util import *
+from utils.target_utils import *
 def create_data(root,create_num,img_num,overwrite):
     batch_size = 1
     if os.path.exists(f'{root}/images') is not True:

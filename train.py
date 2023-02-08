@@ -1,5 +1,3 @@
-import keras.metrics
-
 
 from utils.Mydataloader import RandomTarget_dataset,Fast_dataset
 from training.callbacks import *
@@ -48,13 +46,11 @@ if __name__=='__main__':
         if type(layer) == type(keras.layers.BatchNormalization()):
             layer.momentum = BN_momentum
     model.summary()
-
-
-
     loss_fn = SSD_loss()
     model.compile(optimizer=keras.optimizers.Adam(),
                   loss=loss_fn,
                   metrics=[Recall()])
+
     save_path = './models_save/%s' % (time.strftime('%Y_%m_%d_%H_%M_%S'))
 
     save_weights = keras.callbacks.ModelCheckpoint(save_path + "/model_{epoch:02d}_{val_loss:.4f}.h5",

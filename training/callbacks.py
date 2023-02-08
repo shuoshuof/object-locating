@@ -47,11 +47,13 @@ class MyTensorboardCallback(keras.callbacks.Callback):
         loss = logs['loss']
         val_loss = logs['val_loss']
         recall = logs['recall']
+        val_recall = logs['val_recall']
         imgs= self.test_model()
         with self.writer.as_default():
             tf.summary.scalar("loss", loss,step=epoch)
             tf.summary.scalar("val_loss",val_loss,step=epoch)
             tf.summary.scalar("recall", recall, step=epoch)
+            tf.summary.scalar("val_recall", val_recall, step=epoch)
             tf.summary.image("test images",imgs,max_outputs=self.test_img_num,step=epoch)
             self.writer.flush()
 
