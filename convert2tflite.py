@@ -13,7 +13,7 @@ import time
 import os
 from utils.target_utils import *
 
-def result_show(img,label,decoder,pred):
+def result_show(img,label,decoder,pred,input_size):
     pred_pos = decoder.decode(pred)
     img = cv2.resize(img,(128,96))
     for point in pred_pos:
@@ -28,7 +28,7 @@ def result_show(img,label,decoder,pred):
     for point in img_pos:
         x, y = point
         cv2.circle(img, (int(x), int(y)), radius=2, color=(0, 255, 0))
-
+    img = cv2.resize(img,(input_size[1],input_size[0]))
     plt.figure()
     plt.imshow(img)
     plt.show()
@@ -59,7 +59,7 @@ def tflite_pre(modelpath,dataset_root,batch_size=1,input_size:tuple = (96,128)):
         print(float(end-start))
         img1 = np.array(img[0], dtype=np.uint8)
         img1 = cv2.resize(img1,(128,96))
-        result_show(img1,label[0],target_decoder(),pred=output[0])
+        result_show(img1,label[0],target_decoder(),pred=output[0],input_size=input_size)
 
 def convert_to_tf_lite(model_path,valid_input_size:tuple):
     model = load_model(model_path,compile=False)
