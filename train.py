@@ -1,4 +1,3 @@
-
 from utils.Mydataloader import RandomTarget_dataset,Fast_dataset
 from training.callbacks import *
 from training.loss_function import SSD_loss
@@ -10,7 +9,7 @@ if __name__=='__main__':
     batch_size =512
     img_num=3
     BN_momentum=0.99
-    input_size = (96,128)
+    input_size = (48,64)
     input_shape = (input_size[0], input_size[1], 3)
     # train_dataset = RandomTarget_dataset(root = r'C:\Project\python\dataset\加框后的JPEG图',
     #                       batch_size=batch_size,bg_r=96,bg_w=128,
