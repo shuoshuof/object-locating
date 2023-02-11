@@ -73,4 +73,3 @@ if __name__ == '__main__':
     # create_data(root=train_root, create_num=train_num, img_num=img_num, overwrite=overwrite)
     # create_data(root=valid_root,create_num=valid_num,img_num=img_num,overwrite=overwrite)
     create_data(root=test_root,create_num=test_num,img_num=img_num,overwrite=overwrite)
-    # labels_transformation('../dataset/train/labels.npy')
