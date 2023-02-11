@@ -16,10 +16,7 @@ from utils.target_utils import *
 def result_show(img,label,decoder,pred,input_size):
     pred_pos = decoder.decode(pred)
     img = cv2.resize(img,(128,96))
-    for point in pred_pos:
-        x, y = point
-        cv2.circle(img, (int(x), int(y)), radius=2, color=(255, 0, 0))
-        cv2.rectangle(img, (int(x) - 14, int(y) - 14), (int(x) + 14, int(y) + 14), color=(255, 0, 0))
+
     for i in range(3):
         for j in range(4):
             y, x = 32 * i, 32 * j
@@ -28,7 +25,11 @@ def result_show(img,label,decoder,pred,input_size):
     for point in img_pos:
         x, y = point
         cv2.circle(img, (int(x), int(y)), radius=2, color=(0, 255, 0))
-    img = cv2.resize(img,(input_size[1],input_size[0]))
+    for point in pred_pos:
+        x, y = point
+        cv2.circle(img, (int(x), int(y)), radius=2, color=(255, 0, 0))
+        cv2.rectangle(img, (int(x) - 14, int(y) - 14), (int(x) + 14, int(y) + 14), color=(255, 0, 0))
+    # img = cv2.resize(img,(input_size[1],input_size[0]))
     plt.figure()
     plt.imshow(img)
     plt.show()
@@ -84,6 +85,6 @@ input_size = (48,64)
 #                    valid_input_size=input_size,
 #                    valid_path='./dataset/valid')
 tflite_pre(modelpath='./tflite_model/02_07_11_59__model_70_0.0246/(48, 64)model_70_0.0246.tflite',
-           dataset_root='./dataset/valid',
+           dataset_root='./dataset/test',
             input_size=input_size
            )

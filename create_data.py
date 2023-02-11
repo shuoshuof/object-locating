@@ -4,7 +4,7 @@ import cv2
 import os
 from utils.util import *
 from utils.target_utils import *
-def create_data(root,create_num,img_num,overwrite):
+def create_data(root,create_num,img_num,overwrite,img_path,bg_path):
     batch_size = 1
     if os.path.exists(f'{root}/images') is not True:
         os.makedirs(f'{root}/images')
@@ -15,9 +15,9 @@ def create_data(root,create_num,img_num,overwrite):
 
         t, labels = check(root)
     while t<create_num:
-        dataset = RandomTarget_dataset(root = r'C:\Project\python\dataset\加框后的JPEG图',
+        dataset = RandomTarget_dataset(root = img_path,
                               batch_size=batch_size,bg_r=96,bg_w=128,
-                              bg_root=r'C:\Project\python\dataset\background',
+                              bg_root=bg_path,
                               img_num=img_num,
                               Chinese_path=True,
                                 valid=True)
@@ -33,7 +33,6 @@ def create_data(root,create_num,img_num,overwrite):
             t += 1
             print(t)
             cv2.imwrite(f'{root}/images/{t}.jpg', img1)
-
             if t >= create_num:
                 break
     labels = np.array(labels)
@@ -65,11 +64,15 @@ if __name__ == '__main__':
     valid_num=1000
     test_num=30
     labels =[]
-    train_root = '../dataset/train'
-    valid_root = '../dataset/valid'
-    test_root = '../dataset/test'
+    train_root = './dataset/train'
+    valid_root = './dataset/valid'
+    test_root = './dataset/test'
+
+    img_path  = r'C:\Project\python\dataset\加框后的JPEG图'
+    bg_path = r'C:\Project\python\dataset\background'
+
     overwrite = True
     img_num = 3
-    # create_data(root=train_root, create_num=train_num, img_num=img_num, overwrite=overwrite)
-    # create_data(root=valid_root,create_num=valid_num,img_num=img_num,overwrite=overwrite)
-    create_data(root=test_root,create_num=test_num,img_num=img_num,overwrite=overwrite)
+    # create_data(root=train_root, create_num=train_num, img_num=img_num, overwrite=overwrite,img_path=img_path,bg_path=bg_path)
+    # create_data(root=valid_root,create_num=valid_num,img_num=img_num,overwrite=overwrite,img_path=img_path,bg_path=bg_path)
+    create_data(root=test_root,create_num=test_num,img_num=img_num,overwrite=overwrite,img_path=img_path,bg_path=bg_path)
