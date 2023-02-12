@@ -76,12 +76,13 @@ def convert_to_tf_lite(model_path,valid_input_size:tuple):
 
     with open(save_path, 'wb') as f:
         f.write(tflite_model)
-
+    return save_path
 input_size = (48,64)
-# convert_to_tf_lite(model_path='models_save/2023_02_07_00_34_58/model_70_0.0246.h5',
-#                    valid_input_size=input_size,
-#                    valid_path='./dataset/valid')
-tflite_pre(modelpath='./tflite_model/02_07_11_59__model_70_0.0246/(48, 64)model_70_0.0246.tflite',
+
+
+save_path = convert_to_tf_lite(model_path='models_save/2023_02_07_00_34_58/model_70_0.0246.h5',
+                   valid_input_size=input_size)
+tflite_pre(modelpath=save_path,
            dataset_root='./dataset/test',
             input_size=input_size
            )
